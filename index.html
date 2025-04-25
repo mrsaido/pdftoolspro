@@ -69,12 +69,10 @@
                 <button class="tab-btn px-6 py-3 font-medium text-gray-600 hover:text-blue-600 focus:outline-none border-b-2 border-transparent hover:border-blue-300 transition" data-tab="extract">
                     <i class="fas fa-cut mr-2"></i> Extraire des pages
                 </button>
-               <!--  <button class="tab-btn px-6 py-3 font-medium text-gray-600 hover:text-blue-600 focus:outline-none border-b-2 border-transparent hover:border-blue-300 transition" data-tab="compress">
-                    <i class="fas fa-compress-alt mr-2"></i> Compresser
-                </button>
-                <button class="tab-btn px-6 py-3 font-medium text-gray-600 hover:text-blue-600 focus:outline-none border-b-2 border-transparent hover:border-blue-300 transition" data-tab="sign">
-                    <i class="fas fa-signature mr-2"></i> Signer
-                </button> -->
+               <button class="tab-btn px-6 py-3 font-medium text-gray-600 hover:text-blue-600 focus:outline-none border-b-2 border-transparent hover:border-blue-300 transition" data-tab="add-logo">
+				<i class="fas fa-image mr-2"></i> Ajouter un logo
+				</button>
+
             </div>
 
             <!-- Contenu des onglets -->
@@ -146,146 +144,256 @@
     </div>
 </div>
 
-<!-- Compresser un PDF 
-<div id="compress" class="tab-content">
-    <h2 class="text-xl font-semibold mb-4 text-gray-800">Compresser un fichier PDF</h2>
-    <div class="dropzone p-8 mb-4 text-center cursor-pointer" id="compress-dropzone">
-        <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-2"></i>
-        <p class="text-gray-600">Glissez-déposez un fichier PDF ici ou cliquez pour sélectionner</p>
-        <input type="file" id="compress-file" class="hidden" accept=".pdf">
-    </div>
-    <div id="compress-file-info" class="hidden mb-4 p-3 bg-gray-50 rounded-md">
-        <div class="flex justify-between items-center">
-            <span class="font-medium text-gray-700" id="compress-file-name"></span>
-            <span class="text-sm text-gray-500" id="compress-file-size"></span>
-        </div>
-    </div>
-    <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Niveau de compression</label>
-        <div class="flex items-center space-x-4">
-            <input type="range" id="compress-level" min="1" max="10" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-            <span id="compress-level-value" class="text-sm font-medium text-gray-700 w-8">5</span>
-        </div>
-        <div class="flex justify-between text-xs text-gray-500 mt-1">
-            <span>Basse qualité</span>
-            <span>Haute qualité</span>
-        </div>
-    </div>
-    <div class="flex justify-between items-center mb-4">
+
+
+<!-- Ajouter un logo -->
+<div id="add-logo" class="tab-content">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">Ajouter un logo à un PDF</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         <div>
-            <label class="flex items-center">
-                <input type="checkbox" id="compress-optimize-images" class="mr-2" checked>
-                <span class="text-gray-700">Optimiser les images</span>
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionner un PDF</label>
+            <div class="dropzone p-8 text-center cursor-pointer" id="logo-pdf-dropzone">
+                <i class="fas fa-file-pdf text-4xl text-red-500 mb-2"></i>
+                <p class="text-gray-600">Glissez-déposez un PDF ici</p>
+                <input type="file" id="logo-pdf-input" class="hidden" accept=".pdf">
+            </div>
         </div>
-        <button id="compress-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-            <i class="fas fa-compress-alt mr-2"></i> Compresser
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionner un logo</label>
+            <div class="dropzone p-8 text-center cursor-pointer" id="logo-image-dropzone">
+                <i class="fas fa-image text-4xl text-blue-500 mb-2"></i>
+                <p class="text-gray-600">Glissez-déposez une image (PNG/JPG) ici</p>
+                <input type="file" id="logo-image-input" class="hidden" accept="image/*">
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Position du logo</label>
+            <select id="logo-position" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="top-left">Haut à gauche</option>
+                <option value="top-right">Haut à droite</option>
+                <option value="center">Haut centré</option>
+                <option value="bottom-left">Bas à gauche</option>
+                <option value="bottom-right">Bas à droite</option>
+                <option value="bottom-center">Bas centré</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Taille du logo (% de la largeur de page)</label>
+            <input type="range" id="logo-scale" min="5" max="100" value="25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>5%</span>
+                <span id="logo-scale-value">25%</span>
+                <span>100%</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flex justify-end">
+        <button id="add-logo-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <i class="fas fa-image mr-2"></i> Ajouter le logo
         </button>
     </div>
-    <div id="compress-progress" class="hidden">
-        <div class="mb-2 text-sm text-gray-600">Compression en cours...</div>
+    
+    <div id="add-logo-progress" class="hidden mt-4">
+        <div class="mb-2 text-sm text-gray-600">Traitement en cours...</div>
         <div class="progress-bar">
-            <div id="compress-progress-fill" class="progress-fill" style="width: 0%"></div>
+            <div id="add-logo-progress-fill" class="progress-fill" style="width: 0%"></div>
         </div>
     </div>
-    <div id="compress-result" class="hidden mt-4 p-3 bg-green-50 rounded-md border border-green-200">
-        <div class="flex justify-between items-center">
-            <div>
-                <h3 class="font-medium text-green-800">Compression terminée</h3>
-                <p class="text-sm text-green-600">Taille originale : <span id="original-size" class="font-medium"></span></p>
-            </div>
-            <div class="text-right">
-                <p class="text-sm text-green-600">Taille compressée : <span id="compressed-size" class="font-medium"></span></p>
-                <p class="text-sm text-green-600">Réduction : <span id="reduction-percent" class="font-medium"></span></p>
-            </div>
-        </div>
-    </div>
-</div> -->
+</div>
 
-<!-- Signer un PDF 
-<div id="sign" class="tab-content">
-    <h2 class="text-xl font-semibold mb-4 text-gray-800">Signer un document PDF</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <div class="dropzone p-8 mb-4 text-center cursor-pointer" id="sign-dropzone">
-                <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-2"></i>
-                <p class="text-gray-600">Glissez-déposez un fichier PDF ici ou cliquez pour sélectionner</p>
-                <input type="file" id="sign-file" class="hidden" accept=".pdf">
-            </div>
-            <div id="sign-file-info" class="hidden mb-4 p-3 bg-gray-50 rounded-md">
-                <div class="flex justify-between items-center">
-                    <span class="font-medium text-gray-700" id="sign-file-name"></span>
-                    <span class="text-sm text-gray-500" id="sign-page-count"></span>
-                </div>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Page à signer</label>
-                <select id="sign-page" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-                    <option value="last">Dernière page</option>
-                    <option value="first">Première page</option>
-                    <option value="all">Toutes les pages</option>
-                    <option value="custom">Page spécifique</option>
-                </select>
-            </div>
-            <div id="sign-custom-page-container" class="hidden mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Numéro de page</label>
-                <input type="number" id="sign-custom-page" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-        </div>
-        <div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Signature numérique</label>
-                <div class="flex space-x-2 mb-2">
-                    <button id="sign-upload-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm transition">
-                        <i class="fas fa-upload mr-2"></i> Télécharger une image
-                    </button>
-                    <button id="sign-draw-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm transition">
-                        <i class="fas fa-pen mr-2"></i> Dessiner une signature
-                    </button>
-                    <button id="sign-token-btn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm transition">
-                        <i class="fas fa-key mr-2"></i> Utiliser un e-Token
-                    </button>
-                </div>
-                <div class="signature-preview rounded-md mb-2" id="signature-preview">
-                    <p class="text-gray-400">Aperçu de la signature</p>
-                </div>
-                <input type="file" id="sign-image" class="hidden" accept="image/*">
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Position de la signature</label>
-                <select id="sign-position" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="bottom-right">En bas à droite</option>
-                    <option value="bottom-left">En bas à gauche</option>
-                    <option value="top-right">En haut à droite</option>
-                    <option value="top-left">En haut à gauche</option>
-                    <option value="center">Centre</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Taille de la signature</label>
-                <input type="range" id="sign-size" min="50" max="200" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Petite</span>
-                    <span>Grande</span>
-                </div>
-            </div>
-            <div class="flex justify-end">
-                <button id="sign-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <i class="fas fa-signature mr-2"></i> Signer le document
-                </button>
-            </div>
-        </div>
-    </div>
-    <div id="sign-progress" class="hidden mt-4">
-        <div class="mb-2 text-sm text-gray-600">Signature en cours...</div>
-        <div class="progress-bar">
-            <div id="sign-progress-fill" class="progress-fill" style="width: 0%"></div>
-        </div>
-    </div>
-</div>-->
+
+
 
 
     <script>
+	
+	//img script 
+	// Gestion de l'onglet Ajouter un logo
+const logoPdfDropzone = document.getElementById('logo-pdf-dropzone');
+const logoPdfInput = document.getElementById('logo-pdf-input');
+const logoImageDropzone = document.getElementById('logo-image-dropzone');
+const logoImageInput = document.getElementById('logo-image-input');
+const logoPosition = document.getElementById('logo-position');
+const logoScale = document.getElementById('logo-scale');
+const logoScaleValue = document.getElementById('logo-scale-value');
+const addLogoBtn = document.getElementById('add-logo-btn');
+const addLogoProgress = document.getElementById('add-logo-progress');
+const addLogoProgressFill = document.getElementById('add-logo-progress-fill');
+
+let logoPdfFile = null;
+let logoImageFile = null;
+
+// Mise à jour de la valeur du scale
+logoScale.addEventListener('input', () => {
+    logoScaleValue.textContent = `${logoScale.value}%`;
+});
+
+// Gestion des dropzones
+logoPdfDropzone.addEventListener('click', () => logoPdfInput.click());
+logoPdfDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    logoPdfDropzone.classList.add('active');
+});
+logoPdfDropzone.addEventListener('dragleave', () => {
+    logoPdfDropzone.classList.remove('active');
+});
+logoPdfDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    logoPdfDropzone.classList.remove('active');
+    handleLogoPdfFile(e.dataTransfer.files[0]);
+});
+
+logoImageDropzone.addEventListener('click', () => logoImageInput.click());
+logoImageDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    logoImageDropzone.classList.add('active');
+});
+logoImageDropzone.addEventListener('dragleave', () => {
+    logoImageDropzone.classList.remove('active');
+});
+logoImageDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    logoImageDropzone.classList.remove('active');
+    handleLogoImageFile(e.dataTransfer.files[0]);
+});
+
+logoPdfInput.addEventListener('change', () => {
+    if (logoPdfInput.files.length > 0) {
+        handleLogoPdfFile(logoPdfInput.files[0]);
+    }
+});
+
+logoImageInput.addEventListener('change', () => {
+    if (logoImageInput.files.length > 0) {
+        handleLogoImageFile(logoImageInput.files[0]);
+    }
+});
+
+function handleLogoPdfFile(file) {
+    if (file.type !== 'application/pdf') {
+        alert('Veuillez sélectionner un fichier PDF');
+        return;
+    }
+    
+    logoPdfFile = file;
+    updateAddLogoBtnState();
+}
+
+function handleLogoImageFile(file) {
+    if (!file.type.includes('image')) {
+        alert('Veuillez sélectionner une image (PNG ou JPG)');
+        return;
+    }
+    
+    logoImageFile = file;
+    updateAddLogoBtnState();
+}
+
+function updateAddLogoBtnState() {
+    addLogoBtn.disabled = !(logoPdfFile && logoImageFile);
+}
+
+// Fonction pour ajouter le logo
+addLogoBtn.addEventListener('click', async () => {
+    if (!logoPdfFile || !logoImageFile) return;
+    
+    addLogoProgress.classList.remove('hidden');
+    addLogoProgressFill.style.width = '0%';
+    
+    try {
+        const pdfBytes = await logoPdfFile.arrayBuffer();
+        const logoBytes = await logoImageFile.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+
+        let logoImage;
+        const fileType = logoImageFile.type;
+        if (fileType.includes("png")) {
+            logoImage = await pdfDoc.embedPng(logoBytes);
+        } else if (fileType.includes("jpeg") || fileType.includes("jpg")) {
+            logoImage = await pdfDoc.embedJpg(logoBytes);
+        } else {
+            alert("Format d'image non supporté. Utilisez PNG ou JPG.");
+            return;
+        }
+
+        const pages = pdfDoc.getPages();
+        const scalePercent = parseInt(logoScale.value);
+        
+        for (const page of pages) {
+            const { width, height } = page.getSize();
+            const logoWidth = (width * scalePercent) / 100;
+            const logoHeight = (logoImage.height / logoImage.width) * logoWidth;
+
+            let x = 0, y = 0;
+            const position = logoPosition.value;
+            const margin = 20; // marge de 20 points
+
+            switch (position) {
+                case 'top-left':
+                    x = margin;
+                    y = height - logoHeight - margin;
+                    break;
+                case 'top-right':
+                    x = width - logoWidth - margin;
+                    y = height - logoHeight - margin;
+                    break;
+                case 'center':
+                    x = (width - logoWidth) / 2;
+                    y = height - logoHeight - margin;
+                    break;
+                case 'bottom-left':
+                    x = margin;
+                    y = margin;
+                    break;
+                case 'bottom-right':
+                    x = width - logoWidth - margin;
+                    y = margin;
+                    break;
+                case 'bottom-center':
+                    x = (width - logoWidth) / 2;
+                    y = margin;
+                    break;
+            }
+
+            page.drawImage(logoImage, {
+                x,
+                y,
+                width: logoWidth,
+                height: logoHeight,
+            });
+        }
+
+        addLogoProgressFill.style.width = '80%';
+        
+        const newPdfBytes = await pdfDoc.save();
+        const pdfBlob = new Blob([newPdfBytes], { type: 'application/pdf' });
+        
+        const fileName = `document_avec_logo_${new Date().toISOString().slice(0, 10)}.pdf`;
+        download(pdfBlob, fileName, 'application/pdf');
+        
+        addLogoProgressFill.style.width = '100%';
+        setTimeout(() => {
+            addLogoProgress.classList.add('hidden');
+        }, 500);
+        
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du logo:', error);
+        addLogoProgress.classList.add('hidden');
+        alert('Une erreur est survenue lors de l\'ajout du logo');
+    }
+});
+	
+
+ 
+
+	//img script
         // Manejo de pestañas
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
