@@ -72,6 +72,9 @@
                <button class="tab-btn px-6 py-3 font-medium text-gray-600 hover:text-blue-600 focus:outline-none border-b-2 border-transparent hover:border-blue-300 transition" data-tab="add-logo">
 				<i class="fas fa-image mr-2"></i> Ajouter un logo
 				</button>
+				<button class="tab-btn px-6 py-3 font-medium text-gray-600 hover:text-blue-600 focus:outline-none border-b-2 border-transparent hover:border-blue-300 transition" data-tab="watermark">
+				<i class="fas fa-water mr-2"></i> Ajouter un filigrane
+				</button>
 
             </div>
 
@@ -253,11 +256,237 @@
     </div>
 </div>
 
+<!-- Filigrane -->
+<div id="watermark" class="tab-content">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">Ajouter un filigrane à un PDF</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionner un PDF</label>
+            <div class="dropzone p-8 text-center cursor-pointer" id="watermark-pdf-dropzone">
+                <i class="fas fa-file-pdf text-4xl text-red-500 mb-2"></i>
+                <p class="text-gray-600">Glissez-déposez un PDF ici</p>
+                <input type="file" id="watermark-pdf-input" class="hidden" accept=".pdf">
+            </div>
+            <div id="watermark-pdf-info" class="hidden mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center truncate">
+                        <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                        <div>
+                            <span id="watermark-pdf-name" class="text-sm font-medium block truncate"></span>
+                            <span id="watermark-pdf-size" class="text-xs text-gray-500"></span>
+                        </div>
+                    </div>
+                    <button id="watermark-pdf-reset" class="text-gray-400 hover:text-red-500 ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Paramètres du filigrane</label>
+            <div class="space-y-4 p-4 bg-gray-50 rounded-md">
+                <div>
+                    <input type="text" id="watermark-text" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Texte du filigrane">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Taille du texte</label>
+                        <input type="number" id="font-size" value="50" min="10" max="200" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Position</label>
+                        <select id="position" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="top">Haut</option>
+                            <option value="center" selected>Centre</option>
+                            <option value="bottom">Bas</option>
+                        </select>
+                    </div>
+                </div>
+                <hr>
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image filigrane</label>
+                    <div class="dropzone p-8 text-center cursor-pointer" id="watermark-image-dropzone">
+                        <i class="fas fa-image text-4xl text-blue-500 mb-2"></i>
+                        <p class="text-gray-600">Glissez-déposez une image ici</p>
+                        <input type="file" id="watermark-image-input" class="hidden" accept="image/*">
+                    </div>
+                    <div class="mt-2">
+                        <label class="block text-sm text-gray-600 mb-1">Taille de l'image (%)</label>
+                        <input type="number" id="image-scale" value="50" min="10" max="200" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end mt-6">
+        <button id="generate-watermark-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <i class="fas fa-magic mr-2"></i> Générer
+        </button>
+    </div>
+
+    <div id="watermark-progress" class="hidden mt-4">
+        <div class="mb-2 text-sm text-gray-600">Traitement en cours...</div>
+        <div class="progress-bar">
+            <div id="watermark-progress-fill" class="progress-fill" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
 
 
 
     <script>
+	//filigrane 
+	// Watermark functionality
+const watermarkPdfDropzone = document.getElementById('watermark-pdf-dropzone');
+const watermarkPdfInput = document.getElementById('watermark-pdf-input');
+const watermarkPdfInfo = document.getElementById('watermark-pdf-info');
+const watermarkPdfName = document.getElementById('watermark-pdf-name');
+const watermarkPdfSize = document.getElementById('watermark-pdf-size');
+const watermarkPdfReset = document.getElementById('watermark-pdf-reset');
+const watermarkImageDropzone = document.getElementById('watermark-image-dropzone');
+const watermarkImageInput = document.getElementById('watermark-image-input');
+const generateWatermarkBtn = document.getElementById('generate-watermark-btn');
+const watermarkProgress = document.getElementById('watermark-progress');
+const watermarkProgressFill = document.getElementById('watermark-progress-fill');
+
+let watermarkPdfFile = null;
+let watermarkImageFile = null;
+
+// Handle PDF file selection
+watermarkPdfDropzone.addEventListener('click', () => watermarkPdfInput.click());
+watermarkPdfInput.addEventListener('change', () => {
+    if (watermarkPdfInput.files.length > 0) {
+        handleWatermarkPdfFile(watermarkPdfInput.files[0]);
+    }
+});
+
+// Handle image file selection
+watermarkImageDropzone.addEventListener('click', () => watermarkImageInput.click());
+watermarkImageInput.addEventListener('change', () => {
+    if (watermarkImageInput.files.length > 0) {
+        watermarkImageFile = watermarkImageInput.files[0];
+        generateWatermarkBtn.disabled = !watermarkPdfFile;
+    }
+});
+
+// Handle PDF file
+async function handleWatermarkPdfFile(file) {
+    if (file.type !== 'application/pdf') {
+        alert('Veuillez sélectionner un fichier PDF');
+        return;
+    }
+    
+    watermarkPdfFile = file;
+    watermarkPdfName.textContent = file.name;
+    watermarkPdfSize.textContent = formatFileSize(file.size);
+    watermarkPdfInfo.classList.remove('hidden');
+    generateWatermarkBtn.disabled = !watermarkPdfFile;
+}
+
+// Generate watermark
+generateWatermarkBtn.addEventListener('click', async () => {
+    if (!watermarkPdfFile) return;
+    
+    watermarkProgress.classList.remove('hidden');
+    watermarkProgressFill.style.width = '0%';
+
+    try {
+        const arrayBuffer = await watermarkPdfFile.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        const pages = pdfDoc.getPages();
+
+        const textInput = document.getElementById('watermark-text').value.trim();
+        const fontSize = parseInt(document.getElementById('font-size').value);
+        const position = document.getElementById('position').value;
+        const imageScalePercent = parseInt(document.getElementById('image-scale').value);
+
+        let embeddedImage = null;
+        let imageDims = null;
+
+        if (watermarkImageFile) {
+            const imageBytes = await watermarkImageFile.arrayBuffer();
+            if (watermarkImageFile.type.includes('png')) {
+                embeddedImage = await pdfDoc.embedPng(imageBytes);
+            } else if (watermarkImageFile.type.includes('jpeg') || watermarkImageFile.type.includes('jpg')) {
+                embeddedImage = await pdfDoc.embedJpg(imageBytes);
+            }
+            
+            if (embeddedImage) {
+                const scaleFactor = imageScalePercent / 100;
+                imageDims = {
+                    width: embeddedImage.width * scaleFactor,
+                    height: embeddedImage.height * scaleFactor
+                };
+            }
+        }
+
+        const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+        for (const page of pages) {
+            const { width, height } = page.getSize();
+
+            // Add text watermark
+            if (textInput) {
+                let yText;
+                switch (position) {
+                    case 'top': yText = height - (fontSize * 2); break;
+                    case 'center': yText = height / 2; break;
+                    case 'bottom': yText = fontSize; break;
+                }
+
+                page.drawText(textInput, {
+                    x: width / 2 - (textInput.length * fontSize * 0.25),
+                    y: yText,
+                    size: fontSize,
+                    font: font,
+                    color: PDFLib.rgb(0.75, 0.75, 0.75),
+                    rotate: PDFLib.degrees(45),
+                    opacity: 0.3,
+                });
+            }
+
+            // Add image watermark
+            if (embeddedImage) {
+                page.drawImage(embeddedImage, {
+                    x: (width - imageDims.width) / 2,
+                    y: (height - imageDims.height) / 2,
+                    width: imageDims.width,
+                    height: imageDims.height,
+                    opacity: 0.3
+                });
+            }
+        }
+
+        watermarkProgressFill.style.width = '80%';
+        const pdfBytes = await pdfDoc.save();
+        const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        
+        const fileName = `document_filigrane_${new Date().toISOString().slice(0, 10)}.pdf`;
+        download(pdfBlob, fileName, 'application/pdf');
+        
+        watermarkProgressFill.style.width = '100%';
+        setTimeout(() => watermarkProgress.classList.add('hidden'), 500);
+
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du filigrane:', error);
+        watermarkProgress.classList.add('hidden');
+        alert('Une erreur est survenue lors de l\'ajout du filigrane');
+    }
+});
+
+// Reset PDF
+watermarkPdfReset.addEventListener('click', () => {
+    watermarkPdfFile = null;
+    watermarkPdfInput.value = '';
+    watermarkPdfInfo.classList.add('hidden');
+    generateWatermarkBtn.disabled = true;
+});
 	
+	//filirgane end
 	//img script 
 	// Gestion de l'onglet Ajouter un logo
 const logoPdfDropzone = document.getElementById('logo-pdf-dropzone');
